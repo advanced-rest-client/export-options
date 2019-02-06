@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+  <title>export-options test</title>
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <link rel="import" href="../export-options.html">
+</head>
+<body>
+  <test-fixture id="Basic">
+    <template>
+      <export-options></export-options>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="Valid">
+    <template>
+      <export-options file="test-file" destination="file"></export-options>
+    </template>
+  </test-fixture>
+
+  <test-fixture id="FullData">
+    <template>
+      <export-options file="test-file.json" destination="drive" skip-import drive='{"parents":["test"]}'></export-options>
+    </template>
+  </test-fixture>
+
+  <script>
+  suite('_computeIsDrive()', () => {
+    let element;
+    setup(() => {
+      element = fixture('Basic');
+    });
+
+    test('Returns true when drive', () => {
+      const result = element._computeIsDrive('drive');
+      assert.isTrue(result);
+    });
+
+    test('Returns false when file', () => {
+      const result = element._computeIsDrive('file');
+      assert.isFalse(result);
+    });
+
+    test('Returns false when undefined', () => {
+      const result = element._computeIsDrive();
+      assert.isFalse(result);
+    });
+
+    test('isDrive is false by default', () => {
+      assert.isFalse(element.isDrive);
+    });
+  });
+
+  suite('_isDriveChanged()', () => {
+    let element;
+    setup(() => {
+      element = fixture('Basic');
+    });
+
+    test('Dispatches iron-resize event', () => {
+      const spy = sinon.spy();
+      element.addEventListener('iron-resize', spy);
+      element._isDriveChanged();
+      assert.isTrue(spy.called);
+    });
+
+    test('Calls _listDriveFolders() when argumet is true', () => {
+      const spy = sinon.spy(element, '_listDriveFolders');
+      element._isDriveChanged(true);
+      assert.isTrue(spy.called);
+    });
+
+    test('Won\'t call _listDriveFolders() when argumet is false', () => {
+      const spy = sinon.spy(element, '_listDriveFolders');
+      element._isDriveChanged(false);
+      assert.isFalse(spy.called);
+    });
+  });
+
+  suite('cancel()', () => {
+    let element;
+    setup(() => {
+      element = fixture('Basic');
+    });
+
+    test('Dispatches cancel event', () => {
+      const spy = sinon.spy();
+      element.addEventListener('cancel', spy);
+      element.cancel();
+      assert.isTrue(spy.called);
+    });
+  });
+
+  suite('confirm()', () => {
+    let element;
+    setup((done) => {
+      element = fixture('Valid');
+      flush(() => done());
+    });
+
+    test('Dispatches accept event', () => {
+      const spy = sinon.spy();
+      element.addEventListener('accept', spy);
+      element.confirm();
+      assert.isTrue(spy.called);
+    });
+
+    test('Ignores event when not valid', () => {
+      element.file = '';
+      const spy = sinon.spy();
+      element.addEventListener('accept', spy);
+      element.confirm();
+      assert.isFalse(spy.called);
+    });
+
+    test('Calls _getValues()', () => {
+      const spy = sinon.spy(element, '_getValues');
+      element.confirm();
+      assert.isTrue(spy.called);
+    });
+
+    test('Event has detail', () => {
+      const spy = sinon.spy();
+      element.addEventListener('accept', spy);
+      element.confirm();
+      assert.typeOf(spy.args[0][0].detail, 'object');
+      assert.deepEqual(spy.args[0][0].detail, element._getValues());
+    });
+  });
+
+  suite('_getValues()', () => {
+    let element;
+    setup((done) => {
+      element = fixture('FullData');
+      flush(() => done());
+    });
+
+    test('Returns object', () => {
+      const result = element._getValues();
+      assert.typeOf(result, 'object');
+    });
+
+    test('Has file', () => {
+      const result = element._getValues();
+      assert.equal(result.file, 'test-file.json');
+    });
+
+    test('Has destination', () => {
+      const result = element._getValues();
+      assert.equal(result.destination, 'drive');
+    });
+
+    test('Has skipImport', () => {
+      const result = element._getValues();
+      assert.isTrue(result.skipImport);
+    });
+
+    test('Has drive', () => {
+      const result = element._getValues();
+      assert.typeOf(result.drive, 'object');
+    });
+
+    test('Drive has parents', () => {
+      const result = element._getValues();
+      assert.typeOf(result.drive.parents, 'array');
+      assert.lengthOf(result.drive.parents, 1);
+      assert.equal(result.drive.parents[0].name, 'test');
+      assert.isUndefined(result.drive.parents[0].id);
+    });
+
+    test('Drive is not set when not a drive', () => {
+      element.destination = 'file';
+      const result = element._getValues();
+      assert.isUndefined(result.drive);
+    });
+  });
+
+  suite('_dispatchReadDriveSettings()', () => {
+    let element;
+    setup(() => {
+      element = fixture('Basic');
+    });
+
+    test('Dispatches settings-read event', () => {
+      const spy = sinon.spy();
+      element.addEventListener('settings-read', spy);
+      element._dispatchReadDriveSettings();
+      assert.isTrue(spy.called);
+    });
+
+    test('Returns the event', () => {
+      const e = element._dispatchReadDriveSettings();
+      assert.typeOf(e, 'customevent');
+      assert.equal(e.type, 'settings-read');
+    });
+
+    test('Event bubbles', () => {
+      const e = element._dispatchReadDriveSettings();
+      assert.isTrue(e.bubbles);
+    });
+
+    test('Event is cancelable', () => {
+      const e = element._dispatchReadDriveSettings();
+      assert.isTrue(e.cancelable);
+    });
+
+    test('Event has detail', () => {
+      const e = element._dispatchReadDriveSettings();
+      assert.typeOf(e.detail, 'object');
+    });
+
+    test('Detail has type', () => {
+      const e = element._dispatchReadDriveSettings();
+      assert.equal(e.detail.type, 'google-drive');
+    });
+  });
+
+  suite('_listDriveFolders()', () => {
+    let element;
+    setup(() => {
+      element = fixture('Basic');
+    });
+
+    test('Clears driveFolders', () => {
+      element.driveFolders = [];
+      element._listDriveFolders();
+      assert.isUndefined(element.driveFolders);
+    });
+
+    test('Calls _dispatchReadDriveSettings()', () => {
+      const spy = sinon.spy(element, '_dispatchReadDriveSettings');
+      element._listDriveFolders();
+      assert.isTrue(spy.called);
+    });
+
+    test('Sets driveFolders property', () => {
+      element.addEventListener('settings-read', function f(e) {
+        element.removeEventListener('settings-read', f);
+        e.preventDefault();
+        e.detail.result = Promise.resolve({
+          appFolders: [{
+            name: 'My APIs',
+            id: 'folder1'
+          }, {
+            name: 'Company\'s APIs',
+            id: 'folder2'
+          }, {
+            name: 'Developing',
+            id: 'folder3'
+          }]
+        });
+      });
+      return element._listDriveFolders()
+      .then(() => {
+        assert.typeOf(element.driveFolders, 'array');
+        assert.lengthOf(element.driveFolders, 3);
+      });
+    });
+
+    test('Skips driveFolders if missing', () => {
+      element.addEventListener('settings-read', function f(e) {
+        element.removeEventListener('settings-read', f);
+        e.preventDefault();
+        e.detail.result = Promise.resolve({});
+      });
+      return element._listDriveFolders()
+      .then(() => {
+        assert.isUndefined(element.driveFolders);
+      });
+    });
+
+    test('Ignores errors', () => {
+      element.addEventListener('settings-read', function f(e) {
+        element.removeEventListener('settings-read', f);
+        e.preventDefault();
+        e.detail.result = Promise.reject(new Error('test'));
+      });
+      return element._listDriveFolders()
+      .then(() => {
+        assert.isUndefined(element.driveFolders);
+      });
+    });
+  });
+
+  suite('_getDriveFolders()', () => {
+    let element;
+    setup(() => {
+      element = fixture('Basic');
+      element.driveFolders = [{
+        name: 'My APIs',
+        id: 'folder1'
+      }, {
+        name: 'Company\'s APIs',
+        id: 'folder2'
+      }, {
+        name: 'Developing',
+        id: 'folder3'
+      }];
+    });
+
+    test('Returns empty array when no drive parents', () => {
+      const result = element._getDriveFolders();
+      assert.deepEqual(result, []);
+    });
+
+    test('Returns names array when no driveFolders', () => {
+      element.driveFolders = undefined;
+      element.drive = {
+        parents: ['f1', 'f2']
+      };
+      const result = element._getDriveFolders();
+      assert.deepEqual(result, [{name: 'f1'}, {name: 'f2'}]);
+    });
+
+    test('Returns names and ids', () => {
+      element.drive = {
+        parents: ['folder1', 'new', 'folder2']
+      };
+      const result = element._getDriveFolders();
+      assert.deepEqual(result, [{name: 'My APIs', id: 'folder1'}, {name: 'new'},
+        {name: 'Company\'s APIs', id: 'folder2'}]);
+    });
+  });
+
+  suite('_stopEvent()', () => {
+    test('Stops propagation', () => {
+      const element = fixture('Basic');
+      const e = {
+        stopPropagation: () => {}
+      };
+      const spy = sinon.spy(e, 'stopPropagation');
+      element._stopEvent(e);
+      assert.isTrue(spy.called);
+    });
+  });
+  </script>
+</body>
+</html>
