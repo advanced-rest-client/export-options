@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "elements": [
     {
-      "description": "`export-options`\n\nExport options dialog for ARC\n\n## Styling\n\n`<export-options>` provides the following custom properties and mixins for styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--export-options` | Mixin applied to this elment | `{}`",
+      "description": "`export-options`\n\nExport options dialog for ARC.\n\nListen for (non-bubbling) `accept` or `cancel` custom events.\n\nThe detail on the `accept` event has the following values:\n\n```json\n{\n \"options\": {\n   \"file\": \"my-demo-file.json\",\n   \"provider\": \"drive\",\n   \"skipImport\": true\n }\n}\n```\n\nAdditionally it can contain provider specific options:\n\n```json\n{\n \"providerOptions\": {\n   \"parents\": [\n     {\n       \"name\": \"Existing folder\",\n       \"id\": \"folder2\"\n     },\n     {\n       \"name\": \"Create folder\",\n     }\n  ]\n}\n```\n\n## Styling\n\n`<export-options>` provides the following custom properties and mixins for styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--export-options` | Mixin applied to this elment | `{}`",
       "summary": "",
       "path": "export-options.html",
       "properties": [
@@ -611,11 +611,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 132,
+              "line": 163,
               "column": 8
             },
             "end": {
-              "line": 132,
+              "line": 163,
               "column": 42
             }
           },
@@ -627,18 +627,18 @@
           }
         },
         {
-          "name": "destination",
+          "name": "provider",
           "type": "string | null | undefined",
-          "description": "Export destination. By default it is `drive` or `file`.",
+          "description": "Export provider. By default it is `drive` or `file`.",
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 136,
+              "line": 167,
               "column": 8
             },
             "end": {
-              "line": 136,
-              "column": 49
+              "line": 167,
+              "column": 46
             }
           },
           "metadata": {
@@ -649,17 +649,17 @@
           }
         },
         {
-          "name": "drive",
+          "name": "providerOptions",
           "type": "Object | null | undefined",
           "description": "Google Drive export options. Only relevant when `file` is set to\n`drive`.\n\nThe object contains `parents` property which is an array of provided\nby the user names of folder to create or IDs of already created\nfolders.\n\nThe `accept` event will contain processed lsit of parents where\neach item is an object with `name` and optional `id` property.\nIf the `id` property is not set then new folder to be created when\nuploading the item to Google Drive.",
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 150,
+              "line": 181,
               "column": 8
             },
             "end": {
-              "line": 156,
+              "line": 187,
               "column": 9
             }
           },
@@ -678,11 +678,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 161,
+              "line": 192,
               "column": 8
             },
             "end": {
-              "line": 161,
+              "line": 192,
               "column": 27
             }
           },
@@ -695,16 +695,16 @@
         {
           "name": "isDrive",
           "type": "boolean | null | undefined",
-          "description": "Computed value, true when current destination is Google Drive.",
+          "description": "Computed value, true when current provider is Google Drive.",
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 165,
+              "line": 196,
               "column": 8
             },
             "end": {
-              "line": 165,
-              "column": 117
+              "line": 196,
+              "column": 114
             }
           },
           "metadata": {
@@ -723,11 +723,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 166,
+              "line": 197,
               "column": 8
             },
             "end": {
-              "line": 166,
+              "line": 197,
               "column": 69
             }
           },
@@ -745,11 +745,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 167,
+              "line": 198,
               "column": 8
             },
             "end": {
-              "line": 167,
+              "line": 198,
               "column": 32
             }
           },
@@ -2844,25 +2844,23 @@
         },
         {
           "name": "connectedCallback",
-          "description": "Provides a default implementation of the standard Custom Elements\n`connectedCallback`.\n\nThe default implementation enables the property effects system and\nflushes any pending properties, and updates shimmed CSS properties\nwhen using the ShadyCSS scoping/custom properties polyfill.",
+          "description": "",
           "privacy": "public",
           "sourceRange": {
-            "file": "../polymer/lib/mixins/element-mixin.html",
             "start": {
-              "line": 590,
-              "column": 6
+              "line": 202,
+              "column": 4
             },
             "end": {
-              "line": 595,
-              "column": 7
+              "line": 210,
+              "column": 5
             }
           },
           "metadata": {},
           "params": [],
           "return": {
             "type": "void"
-          },
-          "inheritedFrom": "Polymer.ElementMixin"
+          }
         },
         {
           "name": "disconnectedCallback",
@@ -2983,11 +2981,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 175,
+              "line": 216,
               "column": 4
             },
             "end": {
-              "line": 177,
+              "line": 218,
               "column": 5
             }
           },
@@ -3010,11 +3008,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 179,
+              "line": 220,
               "column": 4
             },
             "end": {
-              "line": 187,
+              "line": 228,
               "column": 5
             }
           },
@@ -3030,11 +3028,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 189,
+              "line": 230,
               "column": 4
             },
             "end": {
-              "line": 191,
+              "line": 232,
               "column": 5
             }
           },
@@ -3045,16 +3043,16 @@
           }
         },
         {
-          "name": "_validateDestination",
+          "name": "_validateProvider",
           "description": "",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 193,
+              "line": 234,
               "column": 4
             },
             "end": {
-              "line": 195,
+              "line": 236,
               "column": 5
             }
           },
@@ -3070,11 +3068,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 197,
+              "line": 238,
               "column": 4
             },
             "end": {
-              "line": 209,
+              "line": 252,
               "column": 5
             }
           },
@@ -3087,11 +3085,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 216,
+              "line": 259,
               "column": 4
             },
             "end": {
-              "line": 234,
+              "line": 277,
               "column": 5
             }
           },
@@ -3108,11 +3106,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 236,
+              "line": 279,
               "column": 4
             },
             "end": {
-              "line": 238,
+              "line": 281,
               "column": 5
             }
           },
@@ -3132,11 +3130,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 245,
+              "line": 288,
               "column": 4
             },
             "end": {
-              "line": 253,
+              "line": 296,
               "column": 5
             }
           },
@@ -3158,11 +3156,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 262,
+              "line": 305,
               "column": 4
             },
             "end": {
-              "line": 277,
+              "line": 323,
               "column": 5
             }
           },
@@ -3179,11 +3177,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 282,
+              "line": 328,
               "column": 4
             },
             "end": {
-              "line": 293,
+              "line": 339,
               "column": 5
             }
           },
@@ -3200,11 +3198,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 316,
+              "line": 362,
               "column": 4
             },
             "end": {
-              "line": 333,
+              "line": 379,
               "column": 5
             }
           },
@@ -3226,11 +3224,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 335,
+              "line": 381,
               "column": 4
             },
             "end": {
-              "line": 337,
+              "line": 383,
               "column": 5
             }
           },
@@ -4211,11 +4209,11 @@
       "metadata": {},
       "sourceRange": {
         "start": {
-          "line": 123,
+          "line": 154,
           "column": 2
         },
         "end": {
-          "line": 338,
+          "line": 384,
           "column": 3
         }
       },
@@ -4228,11 +4226,11 @@
           "description": "Export file name.",
           "sourceRange": {
             "start": {
-              "line": 132,
+              "line": 163,
               "column": 8
             },
             "end": {
-              "line": 132,
+              "line": 163,
               "column": 42
             }
           },
@@ -4240,31 +4238,31 @@
           "type": "string | null | undefined"
         },
         {
-          "name": "destination",
-          "description": "Export destination. By default it is `drive` or `file`.",
+          "name": "provider",
+          "description": "Export provider. By default it is `drive` or `file`.",
           "sourceRange": {
             "start": {
-              "line": 136,
+              "line": 167,
               "column": 8
             },
             "end": {
-              "line": 136,
-              "column": 49
+              "line": 167,
+              "column": 46
             }
           },
           "metadata": {},
           "type": "string | null | undefined"
         },
         {
-          "name": "drive",
+          "name": "provider-options",
           "description": "Google Drive export options. Only relevant when `file` is set to\n`drive`.\n\nThe object contains `parents` property which is an array of provided\nby the user names of folder to create or IDs of already created\nfolders.\n\nThe `accept` event will contain processed lsit of parents where\neach item is an object with `name` and optional `id` property.\nIf the `id` property is not set then new folder to be created when\nuploading the item to Google Drive.",
           "sourceRange": {
             "start": {
-              "line": 150,
+              "line": 181,
               "column": 8
             },
             "end": {
-              "line": 156,
+              "line": 187,
               "column": 9
             }
           },
@@ -4276,11 +4274,11 @@
           "description": "Tells the application to set configuration on the export file to\nskip import and insert project directly into workspace.",
           "sourceRange": {
             "start": {
-              "line": 161,
+              "line": 192,
               "column": 8
             },
             "end": {
-              "line": 161,
+              "line": 192,
               "column": 27
             }
           },
@@ -4289,15 +4287,15 @@
         },
         {
           "name": "is-drive",
-          "description": "Computed value, true when current destination is Google Drive.",
+          "description": "Computed value, true when current provider is Google Drive.",
           "sourceRange": {
             "start": {
-              "line": 165,
+              "line": 196,
               "column": 8
             },
             "end": {
-              "line": 165,
-              "column": 117
+              "line": 196,
+              "column": 114
             }
           },
           "metadata": {},
@@ -4308,11 +4306,11 @@
           "description": "",
           "sourceRange": {
             "start": {
-              "line": 166,
+              "line": 197,
               "column": 8
             },
             "end": {
-              "line": 166,
+              "line": 197,
               "column": 69
             }
           },
@@ -4329,14 +4327,14 @@
         },
         {
           "type": "CustomEvent",
-          "name": "destination-changed",
-          "description": "Fired when the `destination` property changes.",
+          "name": "provider-changed",
+          "description": "Fired when the `provider` property changes.",
           "metadata": {}
         },
         {
           "type": "CustomEvent",
-          "name": "drive-changed",
-          "description": "Fired when the `drive` property changes.",
+          "name": "provider-options-changed",
+          "description": "Fired when the `providerOptions` property changes.",
           "metadata": {}
         }
       ],

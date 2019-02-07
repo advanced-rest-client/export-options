@@ -54,7 +54,7 @@
     <dom-bind id="demo">
       <template is="dom-bind">
         <div class="vertical-section-container centered card" role="main">
-          <export-options on-accept="_acceptHandler"></export-options>
+          <export-options file="my-demo-file.json" provider="drive" on-accept="_acceptHandler"></export-options>
           <template is="dom-if" if="[[values]]">
             <output>[[values]]</output>
           </template>
@@ -62,26 +62,25 @@
       </template>
     </dom-bind>
     <script>
+    window.addEventListener('settings-read', (e) => {
+      e.preventDefault();
+      e.detail.result = Promise.resolve({
+        appFolders: [{
+          name: 'My APIs',
+          id: 'folder1'
+        }, {
+          name: 'Company\'s APIs',
+          id: 'folder2'
+        }, {
+          name: 'Developing',
+          id: 'folder3'
+        }]
+      });
+    });
     (function(app) {
       app._acceptHandler = function(e) {
         app.values = JSON.stringify(e.detail, null, 2);
       };
-      app._handleSettings = function(e) {
-        e.preventDefault();
-        e.detail.result = Promise.resolve({
-          appFolders: [{
-            name: 'My APIs',
-            id: 'folder1'
-          }, {
-            name: 'Company\'s APIs',
-            id: 'folder2'
-          }, {
-            name: 'Developing',
-            id: 'folder3'
-          }]
-        });
-      };
-      window.addEventListener('settings-read', app._handleSettings);
     })(document.getElementById('demo'));
   </script>
   </body>

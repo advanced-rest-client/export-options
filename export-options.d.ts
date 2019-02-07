@@ -29,7 +29,38 @@ declare namespace ApiElements {
   /**
    * `export-options`
    *
-   * Export options dialog for ARC
+   * Export options dialog for ARC.
+   *
+   * Listen for (non-bubbling) `accept` or `cancel` custom events.
+   *
+   * The detail on the `accept` event has the following values:
+   *
+   * ```json
+   * {
+   *  "options": {
+   *    "file": "my-demo-file.json",
+   *    "provider": "drive",
+   *    "skipImport": true
+   *  }
+   * }
+   * ```
+   *
+   * Additionally it can contain provider specific options:
+   *
+   * ```json
+   * {
+   *  "providerOptions": {
+   *    "parents": [
+   *      {
+   *        "name": "Existing folder",
+   *        "id": "folder2"
+   *      },
+   *      {
+   *        "name": "Create folder",
+   *      }
+   *   ]
+   * }
+   * ```
    *
    * ## Styling
    *
@@ -47,9 +78,9 @@ declare namespace ApiElements {
     file: string|null|undefined;
 
     /**
-     * Export destination. By default it is `drive` or `file`.
+     * Export provider. By default it is `drive` or `file`.
      */
-    destination: string|null|undefined;
+    provider: string|null|undefined;
 
     /**
      * Google Drive export options. Only relevant when `file` is set to
@@ -64,7 +95,7 @@ declare namespace ApiElements {
      * If the `id` property is not set then new folder to be created when
      * uploading the item to Google Drive.
      */
-    drive: object|null|undefined;
+    providerOptions: object|null|undefined;
 
     /**
      * Tells the application to set configuration on the export file to
@@ -73,11 +104,12 @@ declare namespace ApiElements {
     skipImport: boolean|null|undefined;
 
     /**
-     * Computed value, true when current destination is Google Drive.
+     * Computed value, true when current provider is Google Drive.
      */
     readonly isDrive: boolean|null|undefined;
     driveFolders: any[]|null|undefined;
     _driveSuggestions: any[]|null|undefined;
+    connectedCallback(): void;
 
     /**
      * Computes value for `isDrive` property
@@ -88,7 +120,7 @@ declare namespace ApiElements {
     _computeIsDrive(file: String|null): Boolean|null;
     confirm(): void;
     cancel(): void;
-    _validateDestination(): void;
+    _validateProvider(): void;
     _getValues(): any;
 
     /**

@@ -84,14 +84,14 @@
     <iron-form id="form">
       <form method="post" enctype="application/json" autocomplete="on">
         <paper-input label="File name" name="file" autocomplete="on" value="{{file}}" required auto-validate error-message="File name is required"></paper-input>
-        <paper-dropdown-menu label="Destination" name="destination" required error-message="Destination is required" on-iron-select="_validateDestination" id="destination">
-          <paper-listbox slot="dropdown-content" selected="{{destination}}" attr-for-selected="value" selected-value="value">
+        <paper-dropdown-menu label="Destination" name="provider" required error-message="Destination is required" on-iron-select="_validateProvider" id="provider">
+          <paper-listbox slot="dropdown-content" selected="{{provider}}" attr-for-selected="value" selected-value="value">
             <paper-icon-item class="menu-item" value="file"><iron-icon icon="arc:archive" slot="item-icon"></iron-icon>Export to file</paper-icon-item>
             <paper-icon-item class="menu-item" value="drive"><iron-icon icon="arc:drive-color" slot="item-icon"></iron-icon>Export to Google Drive</paper-icon-item>
             <slot name="export-option"></slot>
           </paper-listbox>
         </paper-dropdown-menu>
-        <paper-chip-input label="Drive folders name (optional)" name="drive.parents" value="{{drive.parents}}" hidden$="[[!isDrive]]" source="[[_driveSuggestions]]" chip-remove-icon="arc:close" on-iron-overlay-opened="_stopEvent" on-iron-overlay-closed="_stopEvent"></paper-chip-input>
+        <paper-chip-input label="Drive folders name (optional)" name="providerOptions.parents" value="{{providerOptions.parents}}" hidden$="[[!isDrive]]" source="[[_driveSuggestions]]" chip-remove-icon="arc:close" on-iron-overlay-opened="_stopEvent" on-iron-overlay-closed="_stopEvent"></paper-chip-input>
         <div class="toggle-option">
           <paper-toggle-button checked="{{skipImport}}" title="With this option the file will be read directly to requests workspace instead showing import panel.">When opening file skip import dialog</paper-toggle-button>
         </div>
@@ -106,7 +106,38 @@
   /**
    * `export-options`
    *
-   * Export options dialog for ARC
+   * Export options dialog for ARC.
+   *
+   * Listen for (non-bubbling) `accept` or `cancel` custom events.
+   *
+   * The detail on the `accept` event has the following values:
+   *
+   * ```json
+   * {
+   *  "options": {
+   *    "file": "my-demo-file.json",
+   *    "provider": "drive",
+   *    "skipImport": true
+   *  }
+   * }
+   * ```
+   *
+   * Additionally it can contain provider specific options:
+   *
+   * ```json
+   * {
+   *  "providerOptions": {
+   *    "parents": [
+   *      {
+   *        "name": "Existing folder",
+   *        "id": "folder2"
+   *      },
+   *      {
+   *        "name": "Create folder",
+   *      }
+   *   ]
+   * }
+   * ```
    *
    * ## Styling
    *
@@ -132,9 +163,9 @@
          */
         file: {type: String, notify: true},
         /**
-         * Export destination. By default it is `drive` or `file`.
+         * Export provider. By default it is `drive` or `file`.
          */
-        destination: {type: String, notify: true},
+        provider: {type: String, notify: true},
         /**
          * Google Drive export options. Only relevant when `file` is set to
          * `drive`.
@@ -148,7 +179,7 @@
          * If the `id` property is not set then new folder to be created when
          * uploading the item to Google Drive.
          */
-        drive: {
+        providerOptions: {
           type: Object,
           notify: true,
           value: function() {
@@ -161,12 +192,22 @@
          */
         skipImport: Boolean,
         /**
-         * Computed value, true when current destination is Google Drive.
+         * Computed value, true when current provider is Google Drive.
          */
-        isDrive: {type: Boolean, value: false, computed: '_computeIsDrive(destination)', observer: '_isDriveChanged'},
+        isDrive: {type: Boolean, value: false, computed: '_computeIsDrive(provider)', observer: '_isDriveChanged'},
         driveFolders: {type: Array, observer: '_driveFoldersChanged'},
         _driveSuggestions: Array
       };
+    }
+
+    connectedCallback() {
+      super.connectedCallback();
+      this._isAttached = true;
+      Polymer.RenderStatus.afterNextRender(this, () => {
+        if (this.provider === 'drive' && !this.driveFolders) {
+          this._listDriveFolders();
+        }
+      });
     }
     /**
      * Computes value for `isDrive` property
@@ -191,18 +232,20 @@
       this.dispatchEvent(new CustomEvent('cancel'));
     }
 
-    _validateDestination() {
-      this.$.destination.validate();
+    _validateProvider() {
+      this.$.provider.validate();
     }
 
     _getValues() {
       const result = {
-        file: this.file,
-        destination: this.destination,
-        skipImport: this.skipImport
+        options: {
+          file: this.file,
+          provider: this.provider,
+          skipImport: this.skipImport
+        }
       };
       if (this.isDrive) {
-        result.drive = {
+        result.providerOptions = {
           parents: this._getDriveFolders()
         };
       }
@@ -215,7 +258,7 @@
      * @return {Array<Object>} Parent folders definition.
      */
     _getDriveFolders() {
-      const parents = this.drive.parents || [];
+      const parents = this.providerOptions.parents || [];
       const folders = this.driveFolders;
       for (let i = 0; i < parents.length; i++) {
         const name = parents[i];
@@ -261,6 +304,9 @@
      * for tests.
      */
     _listDriveFolders() {
+      if (!this._isAttached) {
+        return;
+      }
       this.driveFolders = undefined;
       const e = this._dispatchReadDriveSettings();
       if (!e.defaultPrevented) {
