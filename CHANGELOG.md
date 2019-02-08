@@ -8,3 +8,8 @@
 
 
 
+## [2.0.1](https://github.com/advanced-rest-client/export-options/compare/2.0.0...2.0.1) (2019-02-08)
+
+
+
+
