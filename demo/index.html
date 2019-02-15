@@ -62,20 +62,18 @@
       </template>
     </dom-bind>
     <script>
-    window.addEventListener('settings-read', (e) => {
+    window.addEventListener('google-drive-list-app-folders', (e) => {
       e.preventDefault();
-      e.detail.result = Promise.resolve({
-        appFolders: [{
-          name: 'My APIs',
-          id: 'folder1'
-        }, {
-          name: 'Company\'s APIs',
-          id: 'folder2'
-        }, {
-          name: 'Developing',
-          id: 'folder3'
-        }]
-      });
+      e.detail.result = Promise.resolve([{
+        name: 'My APIs',
+        id: 'folder1'
+      }, {
+        name: 'Company\'s APIs',
+        id: 'folder2'
+      }, {
+        name: 'Developing',
+        id: 'folder3'
+      }]);
     });
     (function(app) {
       app._acceptHandler = function(e) {

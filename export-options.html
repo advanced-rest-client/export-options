@@ -258,7 +258,12 @@
      * @return {Array<Object>} Parent folders definition.
      */
     _getDriveFolders() {
-      const parents = this.providerOptions.parents || [];
+      let parents;
+      if (this.providerOptions.parents) {
+        parents = Array.from(this.providerOptions.parents);
+      } else {
+        parents = [];
+      }
       const folders = this.driveFolders;
       for (let i = 0; i < parents.length; i++) {
         const name = parents[i];
@@ -315,11 +320,8 @@
       }
       return e.detail.result
       .catch(() => {})
-      .then((data) => {
-        if (!data || !data.appFolders) {
-          return;
-        }
-        this.driveFolders = data.appFolders;
+      .then((folders) => {
+        this.driveFolders = folders && folders.length ? folders : undefined;
       });
     }
     /**
@@ -327,13 +329,11 @@
      * @return {CustomEvent} e
      */
     _dispatchReadDriveSettings() {
-      const e = new CustomEvent('settings-read', {
+      const e = new CustomEvent('google-drive-list-app-folders', {
         bubbles: true,
         cancelable: true,
         composed: true,
-        detail: {
-          type: 'google-drive'
-        }
+        detail: {}
       });
       this.dispatchEvent(e);
       return e;

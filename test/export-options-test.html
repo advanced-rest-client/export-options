@@ -190,9 +190,9 @@
       element = fixture('Basic');
     });
 
-    test('Dispatches settings-read event', () => {
+    test('Dispatches google-drive-list-app-folders event', () => {
       const spy = sinon.spy();
-      element.addEventListener('settings-read', spy);
+      element.addEventListener('google-drive-list-app-folders', spy);
       element._dispatchReadDriveSettings();
       assert.isTrue(spy.called);
     });
@@ -200,7 +200,7 @@
     test('Returns the event', () => {
       const e = element._dispatchReadDriveSettings();
       assert.typeOf(e, 'customevent');
-      assert.equal(e.type, 'settings-read');
+      assert.equal(e.type, 'google-drive-list-app-folders');
     });
 
     test('Event bubbles', () => {
@@ -216,11 +216,6 @@
     test('Event has detail', () => {
       const e = element._dispatchReadDriveSettings();
       assert.typeOf(e.detail, 'object');
-    });
-
-    test('Detail has type', () => {
-      const e = element._dispatchReadDriveSettings();
-      assert.equal(e.detail.type, 'google-drive');
     });
   });
 
@@ -243,21 +238,19 @@
     });
 
     test('Sets driveFolders property', () => {
-      element.addEventListener('settings-read', function f(e) {
-        element.removeEventListener('settings-read', f);
+      element.addEventListener('google-drive-list-app-folders', function f(e) {
+        element.removeEventListener('google-drive-list-app-folders', f);
         e.preventDefault();
-        e.detail.result = Promise.resolve({
-          appFolders: [{
-            name: 'My APIs',
-            id: 'folder1'
-          }, {
-            name: 'Company\'s APIs',
-            id: 'folder2'
-          }, {
-            name: 'Developing',
-            id: 'folder3'
-          }]
-        });
+        e.detail.result = Promise.resolve([{
+          name: 'My APIs',
+          id: 'folder1'
+        }, {
+          name: 'Company\'s APIs',
+          id: 'folder2'
+        }, {
+          name: 'Developing',
+          id: 'folder3'
+        }]);
       });
       return element._listDriveFolders()
       .then(() => {
@@ -267,10 +260,10 @@
     });
 
     test('Skips driveFolders if missing', () => {
-      element.addEventListener('settings-read', function f(e) {
-        element.removeEventListener('settings-read', f);
+      element.addEventListener('google-drive-list-app-folders', function f(e) {
+        element.removeEventListener('google-drive-list-app-folders', f);
         e.preventDefault();
-        e.detail.result = Promise.resolve({});
+        e.detail.result = Promise.resolve([]);
       });
       return element._listDriveFolders()
       .then(() => {
@@ -279,8 +272,8 @@
     });
 
     test('Ignores errors', () => {
-      element.addEventListener('settings-read', function f(e) {
-        element.removeEventListener('settings-read', f);
+      element.addEventListener('google-drive-list-app-folders', function f(e) {
+        element.removeEventListener('google-drive-list-app-folders', f);
         e.preventDefault();
         e.detail.result = Promise.reject(new Error('test'));
       });
