@@ -1,29 +1,56 @@
 {
-  "name": "@advanced-rest-client/export-options",
   "description": "Export options dialog for ARC",
-  "version": "2.1.0",
+  "keywords": [
+    "api-components"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/advanced-rest-client/export-options.git"
+  },
+  "name": "@advanced-rest-client/export-options",
+  "version": "3.0.0-preview.1",
   "license": "Apache-2.0",
-  "main": "export-options.html",
+  "main": "export-options.js",
   "authors": [
     "Pawel Psztyc",
     "The Advanced REST client authors <arc@mulesoft.com>"
   ],
   "devDependencies": {
-    "@polymer/gen-typescript-declarations": "^1.6.1"
+    "@polymer/gen-typescript-declarations": "^1.6.1",
+    "@polymer/iron-demo-helpers": "^3.0.0",
+    "@polymer/iron-component-page": "^4.0.0",
+    "@polymer/iron-test-helpers": "^3.0.0",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "web-animations-js": "^2.3.1",
+    "@polymer/test-fixture": "^4.0.2",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "sinon": "^7.2.3",
+    "wct-mocha": "^1.0.0"
   },
-  "private": false,
   "scripts": {
     "lint": "polymer lint export-options.html",
     "test-sauce": "polymer test --plugin sauce --job-name \"export-options:local-test\"",
     "test": "polymer test --plugin local",
     "update-types": "gen-typescript-declarations --deleteExisting --outDir ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/advanced-rest-client/export-options.git"
-  },
   "bugs": {
     "url": "https://github.com/advanced-rest-client/export-options/issues",
     "email": "arc@mulesoft.com"
+  },
+  "contributors": [
+    "Pawel Psztyc",
+    "The Advanced REST client authors <arc@mulesoft.com>"
+  ],
+  "dependencies": {
+    "@polymer/polymer": "^3.0.0",
+    "@polymer/paper-button": "^3.0.0",
+    "@polymer/paper-dropdown-menu": "^3.0.0",
+    "@polymer/paper-listbox": "^3.0.0",
+    "@polymer/paper-item": "^3.0.0",
+    "@polymer/paper-input": "^3.0.0",
+    "@polymer/paper-toggle-button": "^3.0.0",
+    "@polymer/iron-icon": "^3.0.0",
+    "@polymer/iron-form": "^3.0.0"
   }
 }
