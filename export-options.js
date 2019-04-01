@@ -1,16 +1,16 @@
-import { PolymerElement } from '../../@polymer/polymer/polymer-element.js';
+import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
+import {afterNextRender} from '../../@polymer/polymer/lib/utils/render-status.js';
+import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
 import '../../@polymer/paper-button/paper-button.js';
 import '../../@polymer/paper-listbox/paper-listbox.js';
 import '../../@polymer/paper-item/paper-icon-item.js';
-import '../../arc-icons/arc-icons.js';
+import '../../@advanced-rest-client/arc-icons/arc-icons.js';
 import '../../@polymer/paper-input/paper-input.js';
 import '../../@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
 import '../../@polymer/iron-icon/iron-icon.js';
 import '../../@polymer/iron-form/iron-form.js';
-import '../../paper-chip-input/paper-chip-input.js';
+import '../../@advanced-rest-client/paper-chip-input/paper-chip-input.js';
 import '../../@polymer/paper-toggle-button/paper-toggle-button.js';
-import { html } from '../../@polymer/polymer/lib/utils/html-tag.js';
-import { afterNextRender } from '../../@polymer/polymer/lib/utils/render-status.js';
 /**
  * `export-options`
  *
@@ -53,7 +53,8 @@ import { afterNextRender } from '../../@polymer/polymer/lib/utils/render-status.
  *
  * Custom property | Description | Default
  * ----------------|-------------|----------
- * `--export-options` | Mixin applied to this elment | `{}`
+ * `--primary-color` | Theme property, button color or action button background color | ``
+ * `--primary-action-color` | Theme property, action button color | `#fff`
  *
  * @customElement
  * @polymer
@@ -66,7 +67,6 @@ class ExportOptions extends PolymerElement {
     <style>
     :host {
       display: block;
-      @apply --export-options;
     }
 
     [hidden] {
@@ -74,7 +74,9 @@ class ExportOptions extends PolymerElement {
     }
 
     h3 {
-      @apply --arc-font-subhead;
+      font-size: var(--arc-font-subhead-font-size);
+      font-weight: var(--arc-font-subhead-font-weight);
+      line-height: var(--arc-font-subhead-line-height);
     }
 
     .menu-item iron-icon {
@@ -96,11 +98,6 @@ class ExportOptions extends PolymerElement {
       color: var(--context-menu-item-color-hover);
     }
 
-    .action-button {
-      background-color: var(--primary-color);
-      color: #fff;
-    }
-
     .actions {
       display: -ms-flexbox;
       -ms-flex-direction: row;
@@ -113,7 +110,6 @@ class ExportOptions extends PolymerElement {
       justify-content: flex-end;
 
       margin-top: 20px;
-      @apply --export-options-actions-container;
     }
 
     .actions paper-button {
@@ -121,11 +117,11 @@ class ExportOptions extends PolymerElement {
       background-color: var(--export-options-action-button-background-color);
       padding-left: 12px;
       padding-right: 12px;
-      @apply --export-options-action-buttons;
     }
 
     .actions paper-button.action-button {
-      @apply --action-button;
+      background-color: var(--primary-color);
+      color: var(--primary-action-color, #fff);
     }
 
     .toggle-option {

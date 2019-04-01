@@ -5,24 +5,12 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   export-options.html
+ *   export-options.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
-
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../paper-button/paper-button.d.ts" />
-/// <reference path="../paper-listbox/paper-listbox.d.ts" />
-/// <reference path="../paper-item/paper-icon-item.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../paper-input/paper-input.d.ts" />
-/// <reference path="../paper-dropdown-menu/paper-dropdown-menu.d.ts" />
-/// <reference path="../iron-icon/iron-icon.d.ts" />
-/// <reference path="../iron-form/iron-form.d.ts" />
-/// <reference path="../paper-chip-input/paper-chip-input.d.ts" />
-/// <reference path="../paper-toggle-button/paper-toggle-button.d.ts" />
 
 declare namespace ApiElements {
 
@@ -68,9 +56,10 @@ declare namespace ApiElements {
    *
    * Custom property | Description | Default
    * ----------------|-------------|----------
-   * `--export-options` | Mixin applied to this elment | `{}`
+   * `--primary-color` | Theme property, button color or action button background color | ``
+   * `--primary-action-color` | Theme property, action button color | `#fff`
    */
-  class ExportOptions extends Polymer.Element {
+  class ExportOptions extends PolymerElement {
 
     /**
      * Export file name.
@@ -188,6 +177,11 @@ declare namespace ApiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "export-options": ApiElements.ExportOptions;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "export-options": ApiElements.ExportOptions;
+  }
 }
+
+export {};
