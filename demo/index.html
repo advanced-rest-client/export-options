@@ -1,84 +1,52 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
-    <title>export-options demo</title>
-    <script src="../../../@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-    <script src="../../../web-animations-js/web-animations-next.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
 
-    <script type="module" src="../../../@webcomponents/shadycss/entrypoints/apply-shim.js"></script>
-    <script type="module" src="../../../@polymer/polymer/lib/elements/custom-style.js"></script>
-    <script type="module" src="../../../@polymer/polymer/lib/elements/dom-bind.js"></script>
-    <script type="module" src="../../../@polymer/iron-demo-helpers/demo-pages-shared-styles.js"></script>
-    <script type="module" src="../../../@polymer/iron-demo-helpers/demo-snippet.js"></script>
-    <script type="module" src="../../../@advanced-rest-client/arc-electron-default-theme/arc-electron-default-theme.js"></script>
-    <script type="module" src="../export-options.js"></script>
-    <style>
-    body,
-    html {
-      background-color: #e5e5e5;
-      height: 100vh;
-      margin: 0;
-      padding: 0;
-    }
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+  <title>export-options demo</title>
+  <script src="../node_modules/web-animations-js/web-animations-next.min.js"></script>
+  <script type="module" src=""></script>
+  <style>
+  body,
+  html {
+    background-color: #e5e5e5;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+  }
 
-    html {
-      --paper-chip-autocomplete-background-color: #fff;
-    }
+  html {
+    --paper-chip-autocomplete-background-color: #fff;
+  }
 
-    output {
-      display: block;
-      white-space: pre-wrap;
-      padding: 8px;
-      background-color: #FFF8E1;
-      margin-top: 20px;
-    }
+  output {
+    display: block;
+    white-space: pre-wrap;
+    padding: 8px;
+    background-color: #FFF8E1;
+    margin-top: 20px;
+  }
 
-    .card {
-      padding: 20px;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      box-sizing: border-box;
-      background-color: #fff;
-    }
-    </style>
-    <custom-style>
-      <style is="custom-style" include="demo-pages-shared-styles">
-      .card {
-        @apply --shadow-elevation-4dp;
-      }
-      </style>
-    </custom-style>
-  </head>
-  <body>
-    <dom-bind id="demo">
-      <template is="dom-bind">
-        <div class="vertical-section-container centered card" role="main">
-          <export-options file="my-demo-file.json" provider="drive" on-accept="_acceptHandler"></export-options>
-          <template is="dom-if" if="[[values]]">
-            <output>[[values]]</output>
-          </template>
-        </div>
-      </template>
-    </dom-bind>
-    <script>
-    window.addEventListener('google-drive-list-app-folders', (e) => {
-      e.preventDefault();
-      e.detail.result = Promise.resolve([{
-        name: 'My APIs',
-        id: 'folder1'
-      }, {
-        name: 'Company\'s APIs',
-        id: 'folder2'
-      }, {
-        name: 'Developing',
-        id: 'folder3'
-      }]);
-    });
-    (function(app) {
-      app._acceptHandler = function(e) {
-        app.values = JSON.stringify(e.detail, null, 2);
-      };
-    })(document.getElementById('demo'));
-  </script>
-  </body>
+  .card {
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    background-color: #fff;
+    box-shadow: 0 3px 4px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 8px 0 rgba(0, 0, 0, 0.12),
+                  0 3px 3px -2px rgba(0, 0, 0, 0.4);
+  }
+  </style>
+</head>
+
+<body>
+  <div class="vertical-section-container centered card" role="main">
+    <export-options file="my-demo-file.arc" provider="drive"></export-options>
+    <output></output>
+  </div>
+  <script type="module" src="./index.js"></script>
+</body>
+
 </html>

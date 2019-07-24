@@ -1,16 +1,14 @@
-import {PolymerElement} from '../../@polymer/polymer/polymer-element.js';
-import {afterNextRender} from '../../@polymer/polymer/lib/utils/render-status.js';
-import {html} from '../../@polymer/polymer/lib/utils/html-tag.js';
-import '../../@polymer/paper-button/paper-button.js';
-import '../../@polymer/paper-listbox/paper-listbox.js';
-import '../../@polymer/paper-item/paper-icon-item.js';
-import '../../@advanced-rest-client/arc-icons/arc-icons.js';
-import '../../@polymer/paper-input/paper-input.js';
-import '../../@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
-import '../../@polymer/iron-icon/iron-icon.js';
-import '../../@polymer/iron-form/iron-form.js';
-import '../../@advanced-rest-client/paper-chip-input/paper-chip-input.js';
-import '../../@polymer/paper-toggle-button/paper-toggle-button.js';
+import { LitElement, html, css } from 'lit-element';
+import '@polymer/paper-button/paper-button.js';
+import '@polymer/paper-listbox/paper-listbox.js';
+import '@polymer/paper-item/paper-icon-item.js';
+import '@advanced-rest-client/arc-icons/arc-icons.js';
+import '@polymer/paper-input/paper-input.js';
+import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
+import '@polymer/iron-icon/iron-icon.js';
+import '@polymer/iron-form/iron-form.js';
+import '@advanced-rest-client/paper-chip-input/paper-chip-input.js';
+import '@polymer/paper-toggle-button/paper-toggle-button.js';
 /**
  * `export-options`
  *
@@ -61,11 +59,9 @@ import '../../@polymer/paper-toggle-button/paper-toggle-button.js';
  * @demo demo/index.html
  * @memberof ApiElements
  */
-class ExportOptions extends PolymerElement {
-  static get template() {
-    return html`
-    <style>
-    :host {
+class ExportOptions extends LitElement {
+  static get styles() {
+    return css`:host {
       display: block;
     }
 
@@ -99,16 +95,9 @@ class ExportOptions extends PolymerElement {
     }
 
     .actions {
-      display: -ms-flexbox;
-      -ms-flex-direction: row;
-      -ms-flex-pack: end;
-      display: -webkit-flex;
-      -webkit-flex-direction: row;
-      -webkit-justify-content: flex-end;
       display: flex;
       flex-direction: row;
       justify-content: flex-end;
-
       margin-top: 20px;
     }
 
@@ -126,45 +115,76 @@ class ExportOptions extends PolymerElement {
 
     .toggle-option {
       margin: 8px 0;
-    }
-    </style>
-    <h3>Export options</h3>
-    <iron-form id="form">
+    }`;
+  }
+  render() {
+    const { file, provider, isDrive, providerOptions, _driveSuggestions, skipImport } = this;
+    return html`<h3>Export options</h3>
+    <iron-form>
       <form method="post" enctype="application/json" autocomplete="on">
-        <paper-input label="File name" name="file" autocomplete="on" value="{{file}}" required="" auto-validate="" error-message="File name is required"></paper-input>
-        <paper-dropdown-menu label="Destination" name="provider" required="" error-message="Destination is required" on-iron-select="_validateProvider" id="provider">
-          <paper-listbox slot="dropdown-content" selected="{{provider}}" attr-for-selected="value" selected-value="value">
-            <paper-icon-item class="menu-item" value="file"><iron-icon icon="arc:archive" slot="item-icon"></iron-icon>Export to file</paper-icon-item>
-            <paper-icon-item class="menu-item" value="drive"><iron-icon icon="arc:drive-color" slot="item-icon"></iron-icon>Export to Google Drive</paper-icon-item>
+        <paper-input
+          label="File name" name="file"
+          autocomplete="on"
+          .value="${file}"
+          @input="${this._fileNameChanged}"
+          required
+          auto-validate
+          error-message="File name is required"></paper-input>
+        <paper-dropdown-menu
+          class="provider-selector"
+          label="Destination"
+          name="provider"
+          required
+          error-message="Destination is required"
+          @iron-select="${this._validateProvider}">
+          <paper-listbox slot="dropdown-content"
+            .selected="${provider}" attr-for-selected="value" selected-value="value">
+            <paper-icon-item class="menu-item" value="file">
+              <iron-icon icon="arc:archive" slot="item-icon"></iron-icon>
+              Export to file
+            </paper-icon-item>
+            <paper-icon-item class="menu-item" value="drive">
+              <iron-icon icon="arc:drive-color" slot="item-icon"></iron-icon>
+              Export to Google Drive
+            </paper-icon-item>
             <slot name="export-option"></slot>
           </paper-listbox>
         </paper-dropdown-menu>
-        <paper-chip-input label="Drive folders name (optional)" name="providerOptions.parents" value="{{providerOptions.parents}}" hidden\$="[[!isDrive]]" source="[[_driveSuggestions]]" chip-remove-icon="arc:close" on-iron-overlay-opened="_stopEvent" on-iron-overlay-closed="_stopEvent"></paper-chip-input>
+        ${isDrive ? html`<paper-chip-input
+          label="Drive folders name (optional)"
+          name="providerOptions.parents"
+          .value="${providerOptions.parents}"
+          @value-changed="${this._providerParentsHandler}"
+          .source="${_driveSuggestions}"
+          chipremoveicon="arc:close"
+          @iron-overlay-opened="${this._stopEvent}"
+          @iron-overlay-closed="${this._stopEvent}"></paper-chip-input>` : undefined}
         <div class="toggle-option">
-          <paper-toggle-button checked="{{skipImport}}" title="With this option the file will be read directly to requests workspace instead showing import panel.">When opening file skip import dialog</paper-toggle-button>
+          <paper-toggle-button
+            .checked="${skipImport}"
+            @checked-changed="${this._skipImportChanged}"
+            title="With this option the file will be read directly to requests workspace instead showing import panel.">
+            When opening file skip import dialog
+          </paper-toggle-button>
         </div>
         <div class="actions">
-          <paper-button on-click="cancel">Cancel</paper-button>
-          <paper-button on-click="confirm" class="action-button">Export</paper-button>
+          <paper-button @click="${this.cancel}">Cancel</paper-button>
+          <paper-button @click="${this.confirm}" class="action-button">Export</paper-button>
         </div>
       </form>
-    </iron-form>
-`;
+    </iron-form>`;
   }
 
-  static get is() {
-    return 'export-options';
-  }
   static get properties() {
     return {
       /**
        * Export file name.
        */
-      file: {type: String, notify: true},
+      file: { type: String },
       /**
        * Export provider. By default it is `drive` or `file`.
        */
-      provider: {type: String, notify: true},
+      provider: { type: String },
       /**
        * Google Drive export options. Only relevant when `file` is set to
        * `drive`.
@@ -178,47 +198,142 @@ class ExportOptions extends PolymerElement {
        * If the `id` property is not set then new folder to be created when
        * uploading the item to Google Drive.
        */
-      providerOptions: {
-        type: Object,
-        notify: true,
-        value: function() {
-          return {};
-        }
-      },
+      providerOptions: { type: Object },
       /**
        * Tells the application to set configuration on the export file to
        * skip import and insert project directly into workspace.
        */
-      skipImport: Boolean,
+      skipImport: { type: Boolean },
       /**
        * Computed value, true when current provider is Google Drive.
        */
-      isDrive: {type: Boolean, value: false, computed: '_computeIsDrive(provider)', observer: '_isDriveChanged'},
-      driveFolders: {type: Array, observer: '_driveFoldersChanged'},
+      isDrive: { type: Boolean },
+      driveFolders: { type: Array },
       _driveSuggestions: Array
     };
   }
 
+  get provider() {
+    return this._provider;
+  }
+
+  set provider(value) {
+    const old = this._provider;
+    if (old === value) {
+      return;
+    }
+    this._provider = value;
+    this.requestUpdate('provider', value);
+    this.isDrive = value === 'drive';
+    this._isDriveChanged();
+  }
+
+  get driveFolders() {
+    return this._driveFolders;
+  }
+
+  set driveFolders(value) {
+    const old = this._driveFolders;
+    if (old === value) {
+      return;
+    }
+    this._driveFolders = value;
+    this._driveFoldersChanged(value);
+  }
+  /**
+   * @return {Function} Previously registered handler for `google-drive-list-app-folders` event
+   */
+  get ongoogledrivelistappfolders() {
+    return this['_ongoogle-drive-list-app-folders'];
+  }
+  /**
+   * Registers a callback function for `google-drive-list-app-folders` event
+   * @param {Function} value A callback to register. Pass `null` or `undefined`
+   * to clear the listener.
+   */
+  set ongoogledrivelistappfolders(value) {
+    this._registerCallback('google-drive-list-app-folders', value);
+  }
+  /**
+   * @return {Function} Previously registered handler for `accept` event
+   */
+  get onaccept() {
+    return this._onaccept;
+  }
+  /**
+   * Registers a callback function for `accept` event
+   * @param {Function} value A callback to register. Pass `null` or `undefined`
+   * to clear the listener.
+   */
+  set onaccept(value) {
+    this._registerCallback('accept', value);
+  }
+  /**
+   * @return {Function} Previously registered handler for `cancel` event
+   */
+  get oncancel() {
+    return this._oncancel;
+  }
+  /**
+   * Registers a callback function for `cancel` event
+   * @param {Function} value A callback to register. Pass `null` or `undefined`
+   * to clear the listener.
+   */
+  set oncancel(value) {
+    this._registerCallback('cancel', value);
+  }
+  /**
+   * @return {Function} Previously registered handler for `iron-resize` event
+   */
+  get onironresize() {
+    return this['_oniron-resize'];
+  }
+  /**
+   * Registers a callback function for `iron-resize` event
+   * @param {Function} value A callback to register. Pass `null` or `undefined`
+   * to clear the listener.
+   */
+  set onironresize(value) {
+    this._registerCallback('iron-resize', value);
+  }
+
+  get _form() {
+    return this.shadowRoot.querySelector('iron-form');
+  }
+
+  constructor() {
+    super();
+    this.providerOptions = {};
+    this.isDrive = false;
+  }
+
   connectedCallback() {
-    super.connectedCallback();
+    if (super.connectedCallback) {
+      super.connectedCallback();
+    }
     this._isAttached = true;
-    afterNextRender(this, () => {
+    setTimeout(() => {
       if (this.provider === 'drive' && !this.driveFolders) {
         this._listDriveFolders();
       }
     });
   }
-  /**
-   * Computes value for `isDrive` property
-   * @param {String} file Current desination selection.
-   * @return {Boolean} True when file equals `drive`.
-   */
-  _computeIsDrive(file) {
-    return file === 'drive';
+
+  _registerCallback(eventType, value) {
+    const key = `_on${eventType}`;
+    if (this[key]) {
+      this.removeEventListener(eventType, this[key]);
+    }
+    if (typeof value !== 'function') {
+      this[key] = null;
+      return;
+    }
+    this[key] = value;
+    this.addEventListener(eventType, value);
   }
 
   confirm() {
-    if (!this.$.form.validate()) {
+    if (!this._form.validate()) {
       return;
     }
     const data = this._getValues();
@@ -231,8 +346,10 @@ class ExportOptions extends PolymerElement {
     this.dispatchEvent(new CustomEvent('cancel'));
   }
 
-  _validateProvider() {
-    this.$.provider.validate();
+  _validateProvider(e) {
+    const selector = this.shadowRoot.querySelector('.provider-selector');
+    selector.validate();
+    this.provider = e.target.selected;
   }
 
   _getValues() {
@@ -288,14 +405,13 @@ class ExportOptions extends PolymerElement {
    * Called automatically when `isDrive` property change.
    * Dispatches `iron-resize` custom event so parent elements can position this element
    * in e.g dialogs.
-   * @param {Boolean} value Cusrrent isDrive value.
    */
-  _isDriveChanged(value) {
+  _isDriveChanged() {
     this.dispatchEvent(new CustomEvent('iron-resize', {
       bubbles: true,
       composed: true
     }));
-    if (value) {
+    if (this.isDrive) {
       this._listDriveFolders();
     }
   }
@@ -307,21 +423,22 @@ class ExportOptions extends PolymerElement {
    * @return {Promise} This function is called automatically, this returns is
    * for tests.
    */
-  _listDriveFolders() {
+  async _listDriveFolders() {
     if (!this._isAttached) {
       return;
     }
     this.driveFolders = undefined;
     const e = this._dispatchReadDriveSettings();
     if (!e.defaultPrevented) {
-      console.info('Settings read event not handled for drive type.');
-      return;
+      /* global Promise */
+      return Promise.resolve();
     }
-    return e.detail.result
-    .catch(() => {})
-    .then((folders) => {
+    try {
+      const folders = await e.detail.result;
       this.driveFolders = folders && folders.length ? folders : undefined;
-    });
+    } catch (_) {
+      this.driveFolders = undefined;
+    }
   }
   /**
    * Dispatches `settings-read` custom event with type `google-drive`
@@ -381,5 +498,18 @@ class ExportOptions extends PolymerElement {
   _stopEvent(e) {
     e.stopPropagation();
   }
+
+  _fileNameChanged(e) {
+    this.file = e.target.value;
+  }
+
+  _providerParentsHandler(e) {
+    const value = e.target.value;
+    this.providerOptions.parents = value;
+  }
+
+  _skipImportChanged(e) {
+    this.skipImport = e.target.checked;
+  }
 }
-window.customElements.define(ExportOptions.is, ExportOptions);
+window.customElements.define('export-options', ExportOptions);
