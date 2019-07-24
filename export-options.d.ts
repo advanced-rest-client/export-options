@@ -5,24 +5,14 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   export-options.html
+ *   export-options.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../paper-button/paper-button.d.ts" />
-/// <reference path="../paper-listbox/paper-listbox.d.ts" />
-/// <reference path="../paper-item/paper-icon-item.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../paper-input/paper-input.d.ts" />
-/// <reference path="../paper-dropdown-menu/paper-dropdown-menu.d.ts" />
-/// <reference path="../iron-icon/iron-icon.d.ts" />
-/// <reference path="../iron-form/iron-form.d.ts" />
-/// <reference path="../paper-chip-input/paper-chip-input.d.ts" />
-/// <reference path="../paper-toggle-button/paper-toggle-button.d.ts" />
+import {LitElement, html, css} from 'lit-element';
 
 declare namespace ApiElements {
 
@@ -68,19 +58,26 @@ declare namespace ApiElements {
    *
    * Custom property | Description | Default
    * ----------------|-------------|----------
-   * `--export-options` | Mixin applied to this elment | `{}`
+   * `--primary-color` | Theme property, button color or action button background color | ``
+   * `--primary-action-color` | Theme property, action button color | `#fff`
    */
-  class ExportOptions extends Polymer.Element {
-
-    /**
-     * Export file name.
-     */
-    file: string|null|undefined;
+  class ExportOptions extends LitElement {
 
     /**
      * Export provider. By default it is `drive` or `file`.
      */
     provider: string|null|undefined;
+    driveFolders: any[]|null|undefined;
+    ongoogledrivelistappfolders: Function|null;
+    onaccept: Function|null;
+    oncancel: Function|null;
+    onironresize: Function|null;
+    readonly _form: any;
+
+    /**
+     * Export file name.
+     */
+    file: string|null|undefined;
 
     /**
      * Google Drive export options. Only relevant when `file` is set to
@@ -106,21 +103,15 @@ declare namespace ApiElements {
     /**
      * Computed value, true when current provider is Google Drive.
      */
-    readonly isDrive: boolean|null|undefined;
-    driveFolders: any[]|null|undefined;
+    isDrive: boolean|null|undefined;
     _driveSuggestions: any[]|null|undefined;
+    constructor();
     connectedCallback(): void;
-
-    /**
-     * Computes value for `isDrive` property
-     *
-     * @param file Current desination selection.
-     * @returns True when file equals `drive`.
-     */
-    _computeIsDrive(file: String|null): Boolean|null;
+    render(): any;
+    _registerCallback(eventType: any, value: any): void;
     confirm(): void;
     cancel(): void;
-    _validateProvider(): void;
+    _validateProvider(e: any): void;
     _getValues(): any;
 
     /**
@@ -137,10 +128,8 @@ declare namespace ApiElements {
      * Called automatically when `isDrive` property change.
      * Dispatches `iron-resize` custom event so parent elements can position this element
      * in e.g dialogs.
-     *
-     * @param value Cusrrent isDrive value.
      */
-    _isDriveChanged(value: Boolean|null): void;
+    _isDriveChanged(): void;
 
     /**
      * Attempts to read application settings by dispatching `settings-read`
@@ -185,9 +174,15 @@ declare namespace ApiElements {
      */
     _driveFoldersChanged(folders: Array<object|null>|null): void;
     _stopEvent(e: any): void;
+    _fileNameChanged(e: any): void;
+    _providerParentsHandler(e: any): void;
+    _skipImportChanged(e: any): void;
   }
 }
 
-interface HTMLElementTagNameMap {
-  "export-options": ApiElements.ExportOptions;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "export-options": ApiElements.ExportOptions;
+  }
 }
