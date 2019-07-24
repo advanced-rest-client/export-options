@@ -26,3 +26,13 @@
 
 
 
+# [3.0.0](https://github.com/advanced-rest-client/export-options/compare/2.0.0...3.0.0) (2019-07-24)
+
+
+### Bug Fixes
+
+* fixing tests ([d2cae5b](https://github.com/advanced-rest-client/export-options/commit/d2cae5b))
+* not sure what's safari's deal ([bc29919](https://github.com/advanced-rest-client/export-options/commit/bc29919))
+
+
+
