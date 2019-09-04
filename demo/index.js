@@ -1,4 +1,5 @@
 import '@advanced-rest-client/arc-demo-helper/arc-demo-helper.js';
+import '@advanced-rest-client/arc-demo-helper/demo-pages-shared-styles.js';
 import '../export-options.js';
 
 function init() {
@@ -8,7 +9,6 @@ function init() {
     document.querySelector('output').innerText = values;
   };
   opts.ongoogledrivelistappfolders = (e) => {
-    /* global Promise */
     e.preventDefault();
     e.detail.result = Promise.resolve([{
       name: 'My APIs',

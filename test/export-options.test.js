@@ -1,5 +1,5 @@
 import { fixture, assert, nextFrame } from '@open-wc/testing';
-import sinon from 'sinon/pkg/sinon-esm.js';
+import * as sinon from 'sinon/pkg/sinon-esm.js';
 import '../export-options.js';
 
 describe('<export-options>', () => {
@@ -25,9 +25,9 @@ describe('<export-options>', () => {
       element = await basicFixture();
     });
 
-    it('Dispatches iron-resize event', () => {
+    it('Dispatches resize event', () => {
       const spy = sinon.spy();
-      element.addEventListener('iron-resize', spy);
+      element.addEventListener('resize', spy);
       element._isDriveChanged();
       assert.isTrue(spy.called);
     });
@@ -239,7 +239,6 @@ describe('<export-options>', () => {
       element.addEventListener('google-drive-list-app-folders', function f(e) {
         element.removeEventListener('google-drive-list-app-folders', f);
         e.preventDefault();
-        /* global Promise */
         e.detail.result = Promise.reject(new Error('test'));
       });
       await element._listDriveFolders();
@@ -427,17 +426,17 @@ describe('<export-options>', () => {
     });
   });
 
-  describe('onironresize', () => {
+  describe('onresize', () => {
     let element;
     beforeEach(async () => {
       element = await basicFixture();
     });
 
     it('Getter returns previously registered handler', () => {
-      assert.isUndefined(element.onironresize);
+      assert.isUndefined(element.onresize);
       const f = () => {};
-      element.onironresize = f;
-      assert.isTrue(element.onironresize === f);
+      element.onresize = f;
+      assert.isTrue(element.onresize === f);
     });
 
     it('Calls registered function', () => {
@@ -445,9 +444,9 @@ describe('<export-options>', () => {
       const f = () => {
         called = true;
       };
-      element.onironresize = f;
+      element.onresize = f;
       element._isDriveChanged();
-      element.onironresize = null;
+      element.onresize = null;
       assert.isTrue(called);
     });
 
@@ -460,12 +459,19 @@ describe('<export-options>', () => {
       const f2 = () => {
         called2 = true;
       };
-      element.onironresize = f1;
-      element.onironresize = f2;
+      element.onresize = f1;
+      element.onresize = f2;
       element._isDriveChanged();
-      element.onironresize = null;
+      element.onresize = null;
       assert.isFalse(called1);
       assert.isTrue(called2);
+    });
+  });
+
+  describe('a11y', () => {
+    it('is accessible with data', async () => {
+      const element = await fullDataFixture();
+      await assert.isAccessible(element);
     });
   });
 });

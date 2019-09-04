@@ -1,14 +1,14 @@
 import { LitElement, html, css } from 'lit-element';
-import '@polymer/paper-button/paper-button.js';
-import '@polymer/paper-listbox/paper-listbox.js';
-import '@polymer/paper-item/paper-icon-item.js';
+import '@anypoint-web-components/anypoint-button/anypoint-button.js';
+import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
+import '@anypoint-web-components/anypoint-item/anypoint-icon-item.js';
 import '@advanced-rest-client/arc-icons/arc-icons.js';
-import '@polymer/paper-input/paper-input.js';
-import '@polymer/paper-dropdown-menu/paper-dropdown-menu.js';
+import '@anypoint-web-components/anypoint-input/anypoint-input.js';
+import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.js';
 import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-form/iron-form.js';
-import '@advanced-rest-client/paper-chip-input/paper-chip-input.js';
-import '@polymer/paper-toggle-button/paper-toggle-button.js';
+import '@anypoint-web-components/anypoint-chip-input/anypoint-chip-input.js';
+import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
 /**
  * `export-options`
  *
@@ -101,16 +101,9 @@ class ExportOptions extends LitElement {
       margin-top: 20px;
     }
 
-    .actions paper-button {
-      color: var(--export-options-action-button-color, var(--primary-color));
-      background-color: var(--export-options-action-button-background-color);
+    .actions anypoint-button {
       padding-left: 12px;
       padding-right: 12px;
-    }
-
-    .actions paper-button.action-button {
-      background-color: var(--primary-color);
-      color: var(--primary-action-color, #fff);
     }
 
     .toggle-option {
@@ -118,61 +111,104 @@ class ExportOptions extends LitElement {
     }`;
   }
   render() {
-    const { file, provider, isDrive, providerOptions, _driveSuggestions, skipImport } = this;
-    return html`<h3>Export options</h3>
+    const {
+      file,
+      provider,
+      skipImport,
+      compatibility,
+      outlined
+    } = this;
+    return html`
+    <h3>Export options</h3>
     <iron-form>
       <form method="post" enctype="application/json" autocomplete="on">
-        <paper-input
-          label="File name" name="file"
+        <anypoint-input
+          name="file"
           autocomplete="on"
           .value="${file}"
           @input="${this._fileNameChanged}"
           required
-          auto-validate
-          error-message="File name is required"></paper-input>
-        <paper-dropdown-menu
+          autovalidate
+          invalidmessage="File name is required"
+          ?compatibility="${compatibility}"
+          ?outlined="${outlined}">
+          <label slot="label">File name</label>
+        </anypoint-input>
+        <anypoint-dropdown-menu
           class="provider-selector"
-          label="Destination"
           name="provider"
           required
-          error-message="Destination is required"
-          @iron-select="${this._validateProvider}">
-          <paper-listbox slot="dropdown-content"
-            .selected="${provider}" attr-for-selected="value" selected-value="value">
-            <paper-icon-item class="menu-item" value="file">
+          invalidmessage="Destination is required"
+          @select="${this._validateProvider}"
+          ?compatibility="${compatibility}"
+          ?outlined="${outlined}">
+          <label slot="label">Destination</label>
+          <anypoint-listbox
+            slot="dropdown-content"
+            .selected="${provider}"
+            attrforselected="value"
+            selectedvalue="value"
+            ?compatibility="${compatibility}">
+            <anypoint-icon-item
+              class="menu-item"
+              value="file"
+              ?compatibility="${compatibility}">
               <iron-icon icon="arc:archive" slot="item-icon"></iron-icon>
               Export to file
-            </paper-icon-item>
-            <paper-icon-item class="menu-item" value="drive">
+            </anypoint-icon-item>
+            <anypoint-icon-item
+              class="menu-item"
+              value="drive"
+              ?compatibility="${compatibility}">
               <iron-icon icon="arc:drive-color" slot="item-icon"></iron-icon>
               Export to Google Drive
-            </paper-icon-item>
+            </anypoint-icon-item>
             <slot name="export-option"></slot>
-          </paper-listbox>
-        </paper-dropdown-menu>
-        ${isDrive ? html`<paper-chip-input
-          label="Drive folders name (optional)"
-          name="providerOptions.parents"
-          .value="${providerOptions.parents}"
-          @value-changed="${this._providerParentsHandler}"
-          .source="${_driveSuggestions}"
-          chipremoveicon="arc:close"
-          @iron-overlay-opened="${this._stopEvent}"
-          @iron-overlay-closed="${this._stopEvent}"></paper-chip-input>` : undefined}
+          </anypoint-listbox>
+        </anypoint-dropdown-menu>
+        ${this._driveInputTemplate()}
         <div class="toggle-option">
-          <paper-toggle-button
+          <anypoint-checkbox
             .checked="${skipImport}"
             @checked-changed="${this._skipImportChanged}"
+            ?compatibility="${compatibility}"
             title="With this option the file will be read directly to requests workspace instead showing import panel.">
             When opening file skip import dialog
-          </paper-toggle-button>
+          </anypoint-checkbox>
         </div>
         <div class="actions">
-          <paper-button @click="${this.cancel}">Cancel</paper-button>
-          <paper-button @click="${this.confirm}" class="action-button">Export</paper-button>
+          <anypoint-button @click="${this.cancel}">Cancel</anypoint-button>
+          <anypoint-button @click="${this.confirm}" class="action-button">Export</anypoint-button>
         </div>
       </form>
     </iron-form>`;
+  }
+
+  _driveInputTemplate() {
+    const {
+      isDrive
+    } = this;
+    if (!isDrive) {
+      return '';
+    }
+    const {
+      providerOptions,
+      compatibility,
+      outlined,
+      _driveSuggestions
+    } = this;
+    return html`<anypoint-chip-input
+      name="providerOptions.parents"
+      .chipsValue="${providerOptions.parents}"
+      @chips-changed="${this._providerParentsHandler}"
+      .source="${_driveSuggestions}"
+      chipremoveicon="arc:close"
+      @overlay-opened="${this._stopEvent}"
+      @overlay-closed="${this._stopEvent}"
+      ?outlined="${outlined}"
+      ?compatibility="${compatibility}">
+        <label slot="label">Drive folders name (optional)</label>
+      </anypoint-chip-input>`;
   }
 
   static get properties() {
@@ -209,6 +245,14 @@ class ExportOptions extends LitElement {
        */
       isDrive: { type: Boolean },
       driveFolders: { type: Array },
+      /**
+       * Enables Anypoint compatibility
+       */
+      compatibility: { type: Boolean },
+      /**
+       * Enables outlined theme.
+       */
+      outlined: { type: Boolean },
       _driveSuggestions: Array
     };
   }
@@ -283,18 +327,18 @@ class ExportOptions extends LitElement {
     this._registerCallback('cancel', value);
   }
   /**
-   * @return {Function} Previously registered handler for `iron-resize` event
+   * @return {Function} Previously registered handler for `resize` event
    */
-  get onironresize() {
-    return this['_oniron-resize'];
+  get onresize() {
+    return this._onresize;
   }
   /**
-   * Registers a callback function for `iron-resize` event
+   * Registers a callback function for `resize` event
    * @param {Function} value A callback to register. Pass `null` or `undefined`
    * to clear the listener.
    */
-  set onironresize(value) {
-    this._registerCallback('iron-resize', value);
+  set onresize(value) {
+    this._registerCallback('resize', value);
   }
 
   get _form() {
@@ -403,11 +447,11 @@ class ExportOptions extends LitElement {
   }
   /**
    * Called automatically when `isDrive` property change.
-   * Dispatches `iron-resize` custom event so parent elements can position this element
+   * Dispatches `resize` custom event so parent elements can position this element
    * in e.g dialogs.
    */
   _isDriveChanged() {
-    this.dispatchEvent(new CustomEvent('iron-resize', {
+    this.dispatchEvent(new CustomEvent('resize', {
       bubbles: true,
       composed: true
     }));
@@ -430,8 +474,7 @@ class ExportOptions extends LitElement {
     this.driveFolders = undefined;
     const e = this._dispatchReadDriveSettings();
     if (!e.defaultPrevented) {
-      /* global Promise */
-      return Promise.resolve();
+      return;
     }
     try {
       const folders = await e.detail.result;
@@ -467,7 +510,7 @@ class ExportOptions extends LitElement {
    * }
    * ```
    *
-   * This produces suggestions for paper-chip-input in form:
+   * This produces suggestions for anypoint-chip-input in form:
    * ```json
    * {
    *   "value": "Folder name",
@@ -504,7 +547,7 @@ class ExportOptions extends LitElement {
   }
 
   _providerParentsHandler(e) {
-    const value = e.target.value;
+    const value = e.detail.value;
     this.providerOptions.parents = value;
   }
 
