@@ -33,13 +33,12 @@
     "@advanced-rest-client/arc-icons": "^3.0.2",
     "@anypoint-web-components/anypoint-button": "^1.0.11",
     "@anypoint-web-components/anypoint-checkbox": "^1.0.1",
-    "@anypoint-web-components/anypoint-chip-input": "^0.1.0",
-    "@anypoint-web-components/anypoint-dropdown-menu": "^0.1.11",
+    "@anypoint-web-components/anypoint-chip-input": "^0.2.0",
+    "@anypoint-web-components/anypoint-dropdown-menu": "^0.1.12",
     "@anypoint-web-components/anypoint-input": "^0.2.6",
     "@anypoint-web-components/anypoint-item": "^1.0.4",
     "@anypoint-web-components/anypoint-listbox": "^1.0.3",
     "@polymer/iron-form": "^3.0.0",
-    "@polymer/iron-icon": "^3.0.0",
     "lit-element": "^2.2.1"
   },
   "devDependencies": {
@@ -52,6 +51,7 @@
     "@open-wc/testing": "^2.3.4",
     "@open-wc/testing-karma": "^3.1.38",
     "@polymer/gen-typescript-declarations": "^1.6.2",
+    "@polymer/iron-test-helpers": "^3.0.1",
     "@polymer/paper-toggle-button": "^3.0.1",
     "deepmerge": "^4.1.0",
     "es-dev-server": "^1.18.3",

@@ -1,5 +1,6 @@
 import { fixture, assert, nextFrame } from '@open-wc/testing';
 import * as sinon from 'sinon/pkg/sinon-esm.js';
+import * as MockInteractions from '@polymer/iron-test-helpers/mock-interactions.js';
 import '../export-options.js';
 
 describe('<export-options>', () => {
@@ -17,6 +18,13 @@ describe('<export-options>', () => {
       file="test-file.json"
       provider="drive"
       skipimport provideroptions='{"parents":["test"]}'></export-options>`));
+  }
+
+  async function encryptionFixture() {
+    return (await fixture(`<export-options
+      file="test-file.json"
+      provider="file"
+      withEncrypt></export-options>`));
   }
 
   describe('_isDriveChanged()', () => {
@@ -295,6 +303,71 @@ describe('<export-options>', () => {
       const spy = sinon.spy(e, 'stopPropagation');
       element._stopEvent(e);
       assert.isTrue(spy.called);
+    });
+  });
+
+  describe('File encryption', () => {
+    let element;
+    beforeEach(async () => {
+      element = await encryptionFixture();
+    });
+
+    it('renders file encryption option', () => {
+      const node = element.shadowRoot.querySelector('anypoint-checkbox[name="encryptFile"]');
+      assert.ok(node);
+    });
+
+    it('sets encryptFile when selecting encryption checkbox', () => {
+      const node = element.shadowRoot.querySelector('anypoint-checkbox[name="encryptFile"]');
+      MockInteractions.tap(node);
+      assert.isTrue(element.encryptFile);
+    });
+
+    it('renders password input when encryption is enabled', async () => {
+      const node = element.shadowRoot.querySelector('anypoint-checkbox[name="encryptFile"]');
+      MockInteractions.tap(node);
+      await nextFrame();
+      const input = element.shadowRoot.querySelector('anypoint-masked-input[name="passphrase"]');
+      assert.ok(input);
+    });
+
+    it('passphrase input change updates passphrase field', async () => {
+      element.encryptFile = true;
+      await nextFrame();
+      const input = element.shadowRoot.querySelector('anypoint-masked-input[name="passphrase"]');
+      input.value = 'test';
+      assert.equal(element.passphrase, 'test');
+    });
+
+    it('generates configuration with default empty password', async () => {
+      element.encryptFile = true;
+      await nextFrame();
+
+      const spy = sinon.spy();
+      element.addEventListener('accept', spy);
+      element.confirm();
+
+      const { detail } = spy.args[0][0];
+      const { options } = detail;
+      assert.isTrue(options.encrypt, 'encrypt is set');
+      assert.equal(options.passphrase, '', 'passphrase is set');
+    });
+
+    it('generates configuration with set password', async () => {
+      element.encryptFile = true;
+      await nextFrame();
+
+      const input = element.shadowRoot.querySelector('anypoint-masked-input[name="passphrase"]');
+      input.value = 'test';
+
+      const spy = sinon.spy();
+      element.addEventListener('accept', spy);
+      element.confirm();
+
+      const { detail } = spy.args[0][0];
+      const { options } = detail;
+      assert.isTrue(options.encrypt, 'encrypt is set');
+      assert.equal(options.passphrase, 'test', 'passphrase is set');
     });
   });
 

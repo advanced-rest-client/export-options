@@ -2,10 +2,10 @@ import { LitElement, html, css } from 'lit-element';
 import '@anypoint-web-components/anypoint-button/anypoint-button.js';
 import '@anypoint-web-components/anypoint-listbox/anypoint-listbox.js';
 import '@anypoint-web-components/anypoint-item/anypoint-icon-item.js';
-import '@advanced-rest-client/arc-icons/arc-icons.js';
+import { archive, driveColor } from '@advanced-rest-client/arc-icons/ArcIcons.js';
 import '@anypoint-web-components/anypoint-input/anypoint-input.js';
+import '@anypoint-web-components/anypoint-input/anypoint-masked-input.js';
 import '@anypoint-web-components/anypoint-dropdown-menu/anypoint-dropdown-menu.js';
-import '@polymer/iron-icon/iron-icon.js';
 import '@polymer/iron-form/iron-form.js';
 import '@anypoint-web-components/anypoint-chip-input/anypoint-chip-input.js';
 import '@anypoint-web-components/anypoint-checkbox/anypoint-checkbox.js';
@@ -65,23 +65,11 @@ export class ExportOptions extends LitElement {
       line-height: var(--arc-font-subhead-line-height);
     }
 
-    .menu-item iron-icon {
-      color: var(--context-menu-item-color);
-    }
-
-    .menu-item {
-      color: var(--context-menu-item-color);
-      background-color: var(--context-menu-item-background-color);
-      cursor: pointer;
-    }
-
-    .menu-item:hover {
-      color: var(--context-menu-item-color-hover);
-      background-color: var(--context-menu-item-background-color-hover);
-    }
-
-    .menu-item:hover iron-icon {
-      color: var(--context-menu-item-color-hover);
+    .icon {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
     }
 
     .actions {
@@ -98,12 +86,22 @@ export class ExportOptions extends LitElement {
 
     .toggle-option {
       margin: 8px 0;
+    }
+
+    .toggle-option anypoint-checkbox {
+      display: block;
+    }
+
+    anypoint-input,
+    anypoint-chip-input,
+    anypoint-masked-input {
+      width: auto;
     }`;
   }
+
   render() {
     const {
       file,
-      provider,
       skipImport,
       compatibility,
       outlined
@@ -116,7 +114,7 @@ export class ExportOptions extends LitElement {
           name="file"
           autocomplete="on"
           .value="${file}"
-          @input="${this._fileNameChanged}"
+          @input="${this._inputHandler}"
           required
           autovalidate
           invalidmessage="File name is required"
@@ -124,47 +122,19 @@ export class ExportOptions extends LitElement {
           ?outlined="${outlined}">
           <label slot="label">File name</label>
         </anypoint-input>
-        <anypoint-dropdown-menu
-          class="provider-selector"
-          name="provider"
-          required
-          invalidmessage="Destination is required"
-          @select="${this._validateProvider}"
-          ?compatibility="${compatibility}"
-          ?outlined="${outlined}">
-          <label slot="label">Destination</label>
-          <anypoint-listbox
-            slot="dropdown-content"
-            .selected="${provider}"
-            attrforselected="value"
-            selectedvalue="value"
-            ?compatibility="${compatibility}">
-            <anypoint-icon-item
-              class="menu-item"
-              value="file"
-              ?compatibility="${compatibility}">
-              <iron-icon icon="arc:archive" slot="item-icon"></iron-icon>
-              Export to file
-            </anypoint-icon-item>
-            <anypoint-icon-item
-              class="menu-item"
-              value="drive"
-              ?compatibility="${compatibility}">
-              <iron-icon icon="arc:drive-color" slot="item-icon"></iron-icon>
-              Export to Google Drive
-            </anypoint-icon-item>
-            <slot name="export-option"></slot>
-          </anypoint-listbox>
-        </anypoint-dropdown-menu>
+        ${this._destinationTemplate()}
         ${this._driveInputTemplate()}
         <div class="toggle-option">
           <anypoint-checkbox
             .checked="${skipImport}"
-            @checked-changed="${this._skipImportChanged}"
+            name="skipImport"
+            @checked-changed="${this._checkedChanged}"
             ?compatibility="${compatibility}"
-            title="With this option the file will be read directly to requests workspace instead showing import panel.">
-            When opening file skip import dialog
+            title="With this option the file will be read directly to requests workspace instead showing import panel."
+          >
+            Skip import dialog
           </anypoint-checkbox>
+          ${this._encryptionTemplate()}
         </div>
         <div class="actions">
           <anypoint-button @click="${this.cancel}">Cancel</anypoint-button>
@@ -192,13 +162,88 @@ export class ExportOptions extends LitElement {
       .chipsValue="${providerOptions.parents}"
       @chips-changed="${this._providerParentsHandler}"
       .source="${_driveSuggestions}"
-      chipremoveicon="arc:close"
       @overlay-opened="${this._stopEvent}"
       @overlay-closed="${this._stopEvent}"
       ?outlined="${outlined}"
       ?compatibility="${compatibility}">
         <label slot="label">Drive folders name (optional)</label>
       </anypoint-chip-input>`;
+  }
+
+  _destinationTemplate() {
+    const {
+      provider,
+      compatibility,
+      outlined
+    } = this;
+    return html`<anypoint-dropdown-menu
+      class="provider-selector"
+      name="provider"
+      @select="${this._destinationHandler}"
+      ?compatibility="${compatibility}"
+      ?outlined="${outlined}">
+      <label slot="label">Destination</label>
+      <anypoint-listbox
+        slot="dropdown-content"
+        .selected="${provider}"
+        attrforselected="value"
+        selectedvalue="value"
+        ?compatibility="${compatibility}">
+        <anypoint-icon-item
+          class="menu-item"
+          value="file"
+          ?compatibility="${compatibility}"
+        >
+          <span class="icon" slot="item-icon">${archive}</span>
+          Export to file
+        </anypoint-icon-item>
+        <anypoint-icon-item
+          class="menu-item"
+          value="drive"
+          ?compatibility="${compatibility}"
+        >
+          <span class="icon" slot="item-icon">${driveColor}</span>
+          Export to Google Drive
+        </anypoint-icon-item>
+        <slot name="export-option"></slot>
+      </anypoint-listbox>
+    </anypoint-dropdown-menu>`;
+  }
+
+  _encryptionTemplate() {
+    if (!this.withEncrypt) {
+      return '';
+    }
+    const {
+      encryptFile,
+      compatibility
+    } = this;
+    return html`<anypoint-checkbox
+      .checked="${encryptFile}"
+      name="encryptFile"
+      @checked-changed="${this._checkedChanged}"
+      ?compatibility="${compatibility}"
+      title="Encrypts the file with password so it is not store in plain text."
+    >
+      Encrypt file
+    </anypoint-checkbox>
+    ${this._encyptionPasswordTemplate()}`;
+  }
+
+  _encyptionPasswordTemplate() {
+    if (!this.encryptFile) {
+      return;
+    }
+    const {
+      passphrase
+    } = this;
+    return html`<anypoint-masked-input
+      name="passphrase"
+      .value="${passphrase}"
+      @value-changed="${this._inputHandler}"
+    >
+      <label slot="label">Encryption passphrase</label>
+    </anypoint-masked-input>`;
   }
 
   static get properties() {
@@ -243,6 +288,19 @@ export class ExportOptions extends LitElement {
        * Enables outlined theme.
        */
       outlined: { type: Boolean },
+      /**
+       * When set the encrypt file option is enabled.
+       */
+      encryptFile: { type: Boolean },
+      /**
+       * Encryption passphrase
+       */
+      passphrase: { type: String },
+      /**
+       * When set it renders encryption options.
+       */
+      withEncrypt: { type: Boolean },
+
       _driveSuggestions: Array
     };
   }
@@ -380,9 +438,7 @@ export class ExportOptions extends LitElement {
     this.dispatchEvent(new CustomEvent('cancel'));
   }
 
-  _validateProvider(e) {
-    const selector = this.shadowRoot.querySelector('.provider-selector');
-    selector.validate();
+  _destinationHandler(e) {
     this.provider = e.target.selected;
   }
 
@@ -398,6 +454,10 @@ export class ExportOptions extends LitElement {
       result.providerOptions = {
         parents: this._getDriveFolders()
       };
+    }
+    if (this.encryptFile) {
+      result.options.encrypt = true;
+      result.options.passphrase = this.passphrase || '';
     }
     return result;
   }
@@ -532,8 +592,9 @@ export class ExportOptions extends LitElement {
     e.stopPropagation();
   }
 
-  _fileNameChanged(e) {
-    this.file = e.target.value;
+  _inputHandler(e) {
+    const { name, value } = e.target;
+    this[name] = value;
   }
 
   _providerParentsHandler(e) {
@@ -541,7 +602,8 @@ export class ExportOptions extends LitElement {
     this.providerOptions.parents = value;
   }
 
-  _skipImportChanged(e) {
-    this.skipImport = e.target.checked;
+  _checkedChanged(e) {
+    const { name, checked } = e.target;
+    this[name] = checked;
   }
 }
